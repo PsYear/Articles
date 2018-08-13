@@ -7,7 +7,7 @@
 &ensp;&ensp;&ensp;&ensp; 3. 在[call()](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/eager/python/examples/rnn_ptb/rnn_ptb.py#L133)里连接layer，返回[output](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/eager/python/examples/rnn_ptb/rnn_ptb.py#L146)<br>
 
 二、反向传播的使用  
-&ensp;&ensp;&ensp;&ensp;1. 先用tf的api定义loss函数:[loss函数](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/eager/python/examples/rnn_ptb/rnn_ptb.py#L158)<br>
+&ensp;&ensp;&ensp;&ensp;1. 先用tf的api定义[loss函数](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/eager/python/examples/rnn_ptb/rnn_ptb.py#L158)<br>
 &ensp;&ensp;&ensp;&ensp;2. 用tfe的[api](https://www.tensorflow.org/api_docs/python/tf/contrib/eager/implicit_gradients)调用loss得到梯度grads
 ``` Python
      tfe.gradients_function(loss,x)
