@@ -54,3 +54,4 @@ with tf.Session(graph=tf.Graph()) as sess:
 - [Tensorflow 1.13 Serving搭建心得on Docker（三）把keras或tf model改写成serving格式](https://zhuanlan.zhihu.com/p/29374467)
 - [TensorFlow 保存模型为 PB 文件](https://zhuanlan.zhihu.com/p/32887066)
 - [metaflow-ai/blog](https://github.com/metaflow-ai/blog/tree/master/tf-freeze)
+- [TensorFlow: How to freeze a model and serve it with a python API](https://blog.metaflow.fr/tensorflow-how-to-freeze-a-model-and-serve-it-with-a-python-api-d4f3596b3adc)
