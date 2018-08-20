@@ -32,7 +32,8 @@ with K.get_session() as sess:
     builder.save(True)
 print('Finished export', export_path)
 ```
-其中add_meta_graph_and_variables的第二个参数是[可选字符](https://www.tensorflow.org/api_docs/python/tf/saved_model/builder/SavedModelBuilder)虽然保存之后目录里有.pb文件，但这个.pb文件的格式并不能通过```graph_def.ParseFromString(f.read())```的方式进行读入，因为tensorflow的文件读写需要完全使用成对的api进行完成。对应于```f.saved_model.builder.SavedModelBuilder()```的是```tf.saved_model.loader.load()```具体的使用方式如下：
+其中add_meta_graph_and_variables的第二个参数是[可选字符](https://www.tensorflow.org/api_docs/python/tf/saved_model/builder/SavedModelBuilder)。
+虽然保存之后目录里有.pb文件，但这个.pb文件的格式并不能通过```graph_def.ParseFromString(f.read())```的方式进行读入，因为tensorflow的文件读写需要完全使用成对的api进行完成。对应于```f.saved_model.builder.SavedModelBuilder()```的是```tf.saved_model.loader.load()```具体的使用方式如下：
 ``` python
 
 with tf.Session(graph=tf.Graph()) as sess:
