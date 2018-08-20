@@ -1,6 +1,6 @@
 ### Save keras model in protobuf format
 tensorflow 有许多种不同的模型存储[格式](https://zhuanlan.zhihu.com/p/34471266),不同的存储方式调用的存储函数是不一样的，使用tensorflow作为后端的keras也同样支持这些模型保存的方法。这里介绍一种能够方便部署在服务器端和移动端的[protobuf](https://developers.google.com/protocol-buffers/)格式。
-建议采用```from tensorflow import keras```以及``` from tensorflow.python.keras.models import...```来使用keras
+建议采用```from tensorflow import keras```以及``` from tensorflow.python.keras.models import...```来使用keras。
 在构建好keras的网络结构后就可以开始对模型进行保存。为了使之后能便捷找到模型的结点，可以构建模型时对每一层的name参数进行赋值，对相关层命名。
 ``` python
     context_input = Input(shape=(10,),name='context_input')
