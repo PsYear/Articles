@@ -57,7 +57,7 @@ def get_labels(self):
 之后就可以直接运行```run_classsifier.py```进行模型的训练。在运行时需要制定一些参数，一个较为完整的运行参数如下所示：
 ``` bash
 export BERT_BASE_DIR=/path/to/bert/chinese_L-12_H-768_A-12 #全局变量 下载的预训练bert地址
-export MY_DATASET=/path/to/xnli #全局变量 数据集所在地址
+export MY_DATASET=/path/to/xnli #全局变量 数据集所在地址
 
 python run_classifier.py \
   --task_name=selfsim \ #自己添加processor在processors字典里的key名
