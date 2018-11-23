@@ -76,7 +76,7 @@ python run_classifier.py \
 ```
 
 ## bert源代码里还有什么
-在开始训练我们自己fine-tune的bert后，我们可以再来看看bert代码里除了processor之外的一些部分。
+在开始训练我们自己fine-tune的bert后，我们可以再来看看bert代码里除了processor之外的一些部分。  
 我们可以发现，process在得到字符串形式的输入后，在```file_based_convert_examples_to_features```里先是对字符串长度，加入[CLS]和[SEP]等一些处理后，将其写入成TFrecord的形式。这是为了能在estimator里有一个更为高效和简易的读入。  
 我们还可以发现，在```create_model```的函数里，除了从```modeling.py```获取模型主干输出之外，还有进行fine-tune时候的loss计算。因此，如果对于fine-tune的结构有自定义的要求，可以在这部分对代码进行修改。如进行NER任务的时候，可以按照bert论文里的方式，不只读第一位的logits，而是将每一位logits进行读取。  
 bert这次开源的代码，由于是考虑在google自己的TPU上高效地运行，因此采用的estimator是```tf.contrib.tpu.TPUEstimator```,虽然tpu的estimator同样可以在gpu和cpu上运行，但若想在gpu上更高效得做一些提升，可以考虑将其换成```tf.estimator.Estimator```,于此同时model_fn里一些```tf.contrib.tpu.TPUEstimatorSpec```也需要修改成```tf.estimator.EstimatorSpec```的形式，以及相关调用参数也需要做一些调整。在转换成较普通的estimator后便可以使用常用的方式对estimator进行处理，如生成用于部署的```.pb```文件等。
