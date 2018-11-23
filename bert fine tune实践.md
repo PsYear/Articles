@@ -1,5 +1,5 @@
 # bert fine-tune 实践
-从11月初开始，[google-research](https://github.com/google-research)就陆续开源了[bert](https://github.com/google-research/bert)的各个版本。google此次开源的bert是通过tensorflow高级API—— ```tf.estimator```进行封装(wraper)的。因此对于不同数据集的适配，只需要修改代码中的processor部分，就能进行代码的训练、交叉验证和测试。
+从11月初开始，[google-research](https://github.com/google-research)就陆续开源了[bert](https://github.com/google-research/bert)的各个版本。google此次开源的bert是通过tensorflow高级API—— ```tf.estimator```进行封装(wrapper)的。因此对于不同数据集的适配，只需要修改代码中的processor部分，就能进行代码的训练、交叉验证和测试。
 
 ## 在自己的数据集上运行bert
 bert的代码同论文里描述的一致，主要分为两个部分。一个是训练语言模型（language model）的预训练（pretrain）部分。另一个是训练具体任务(task)的fine-tune部分。在开源的代码中，预训练的入口是在```run_pretraining.py```而fine-tune的入口针对不同的任务分别在```run_classifier.py```和```run_squad.py```。其中```run_classifier.py```适用的任务为分类任务。如CoLA、MRPC、MultiNLI这些数据集。而```run_squad.py```适用的是阅读理解(MRC)任务，如squad2.0和squad1.1。预训练是bert很重要的一个部分，与此同时，预训练需要巨大的运算资源。按照论文里描述的参数，其Base的设定在消费级的显卡Titan x 或Titan 1080ti(12GB RAM)上，甚至需要近几个月的时间进行预训练，同时还会面临显存不足的问题。不过所幸的是谷歌满足了[issues#2](https://github.com/google-research/bert/issues/2)里各国开发者的请求，针对大部分语言都公布了bert的[预训练模型](https://github.com/google-research/bert/blob/master/multilingual.md)。因此在我们可以比较方便得在自己的数据集上进行fine-tune。
