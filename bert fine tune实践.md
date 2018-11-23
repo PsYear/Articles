@@ -23,7 +23,7 @@ bert的代码同论文里描述的一致，主要分为两个部分。一个是�
 def get_train_examples(self, data_dir)：
     file_path = os.path.join(data_dir, 'train.csv')
     with open(file_path, 'r') as f:
-        reader = t.readlines()
+        reader = f.readlines()
     examples = []
     for index, line in enumerate(reader):
         guid = 'train-%d'%index
