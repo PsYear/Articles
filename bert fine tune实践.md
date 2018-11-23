@@ -1,8 +1,8 @@
 # bert fine-tune 实践
-从11月初开始，[google-research](https://github.com/google-research)就陆续开源了[bert](https://github.com/google-research/bert)的各个版本。google此次开源的bert是通过tensorflow高级ap—— ```tf.estimator```进行封装(wraper)的。因此对于不同数据集的适配，只需要修改代码中的processor部分，就能进行代码的训练、交叉验证和测试。
+从11月初开始，[google-research](https://github.com/google-research)就陆续开源了[bert](https://github.com/google-research/bert)的各个版本。google此次开源的bert是通过tensorflow高级API—— ```tf.estimator```进行封装(wraper)的。因此对于不同数据集的适配，只需要修改代码中的processor部分，就能进行代码的训练、交叉验证和测试。
 
 ## 在自己的数据集上运行bert
-bert的代码同论文里描述的一致，主要分为两个部分。一个是训练语言模型（language model）的预训练（pretrain）部分。另一个是训练具体任务(task)的fine-tune部分。在开源的代码中，预训练的入口是在```run_pretraining.py```而fine-tune的入口针对不同的任务分别在```run_classifier.py```和```run_squad.py```。其中```run_classifier.py```适用的任务为分类任务。如CoLA、MRPC、MultiNLI这些数据集。而```run_squad.py```适用的是阅读理解(MRC)任务，如squad2.0和squad1.1。预训练是bert很重要的一个部分，与此同时，预训练需要巨大的运算资源。按照论文里描述的参数，其Base的设定在消费级的显卡Titan x 或Titan 1080ti （12GB RAM）上，甚至需要近几个月的时间进行预训练，同时还会面临显存不足的问题。不过所幸的是谷歌针对大部分语言都公布了bert的[预训练模型](https://github.com/google-research/bert/blob/master/multilingual.md)。因此在我们可以比较方便得在自己的数据集上进行fine-tune。
+bert的代码同论文里描述的一致，主要分为两个部分。一个是训练语言模型（language model）的预训练（pretrain）部分。另一个是训练具体任务(task)的fine-tune部分。在开源的代码中，预训练的入口是在```run_pretraining.py```而fine-tune的入口针对不同的任务分别在```run_classifier.py```和```run_squad.py```。其中```run_classifier.py```适用的任务为分类任务。如CoLA、MRPC、MultiNLI这些数据集。而```run_squad.py```适用的是阅读理解(MRC)任务，如squad2.0和squad1.1。预训练是bert很重要的一个部分，与此同时，预训练需要巨大的运算资源。按照论文里描述的参数，其Base的设定在消费级的显卡Titan x 或Titan 1080ti （12GB RAM）上，甚至需要近几个月的时间进行预训练，同时还会面临显存不足的问题。不过所幸的是谷歌满足了[issues#2](https://github.com/google-research/bert/issues/2)里各国开发者的请求，针对大部分语言都公布了bert的[预训练模型](https://github.com/google-research/bert/blob/master/multilingual.md)。因此在我们可以比较方便得在自己的数据集上进行fine-tune。
 ### 下载预训练模型
 对于中文而言，google公布了一个参数较小的bert预训练模型。具体参数数值如下所示：
 >Chinese Simplified and Traditional, 12-layer, 768-hidden, 12-heads, 110M parameters  
@@ -79,14 +79,17 @@ python run_classifier.py \
 在开始训练我们自己fine-tune的bert后，我们可以再来看看bert代码里除了processor之外的一些部分。
 我们可以发现，process在得到字符串形式的输入后，在```file_based_convert_examples_to_features```里先是对字符串长度，加入[CLS]和[SEP]等一些处理后，将其写入成TFrecord的形式。这是为了能在estimator里有一个更为高效和简易的读入。  
 我们还可以发现，在```create_model```的函数里，除了从```modeling.py```获取模型主干输出之外，还有进行fine-tune时候的loss计算。因此，如果对于fine-tune的结构有自定义的要求，可以在这部分对代码进行修改。如进行NER任务的时候，可以按照bert论文里的方式，不只读第一位的logits，而是将每一位logits进行读取。  
-bert这次开源的代码，由于是考虑在google自己的TPU上高效地运行，因此
+bert这次开源的代码，由于是考虑在google自己的TPU上高效地运行，因此采用的estimator是```tf.contrib.tpu.TPUEstimator```,虽然tpu的estimator同样可以在gpu和cpu上运行，但若想在gpu上更高效得做一些提升，可以考虑将其换成```tf.estimator.Estimator```,于此同时model_fn里一些```tf.contrib.tpu.TPUEstimatorSpec```也需要修改成```tf.estimator.EstimatorSpec```的形式，以及相关调用参数也需要做一些调整。在转换成较普通的estimator后便可以使用常用的方式对estimator进行处理，如生成用于部署的```.pb```文件等。
 
 
 
 
 ## issues里一些有趣的内容
-从google对bert进行开源开始，issues里的讨论便异常活跃，bert论文第一作者javob也积极地在issues里进行回应
+从google对bert进行开源开始，issues里的讨论便异常活跃，bert论文第一作者javob devlin也积极地在issues里进行回应，在交流讨论中，产生了一些很有趣的内容。  
+在[#95](https://github.com/google-research/bert/issues/95)中大家讨论了bert模型在今年ai-challenger比赛上的应用。我们也同样尝试了bert在ai-challenger的mrc赛道的表现。如果简单得地将mrc的文本连接成一个长字符串的形式，可以在dev集上得到79.1%的准确率。如果参考openAI的GPT[论文](https://s3-us-west-2.amazonaws.com/openai-assets/research-covers/language-unsupervised/language_understanding_paper.pdf)里multi-choice的形式对bert的输入输出代码进行修改则可以将准确率提高到79.3%。采用的参数都是bert默认的参数，而单一模型成绩在赛道的test a排名中已经能超过榜单上的第一名。因此，在相关中文的任务中，bert能有很大的想象空间。  
+在[#123](https://github.com/google-research/bert/issues/123)中，[@hanxiao](https://github.com/hanxiao)给出了一个采用ZeroMQ便捷部署bert的service，可以直接调用训练好的模型作为应用的接口。同时他将bert改为一个大的encode模型，将文本通过bert进行encode，来实现句子级的encode。此外，他对比了多GPU上的性能，发现bert在多GPU并行上的出色表现。
 
 
 ## 总结
-总的来说，google此次开源的bert和其预训练模型是非常有价值的，可探索和改进的内容也很多。在感谢google这份付出的同时，我们也可以借此站在巨人的肩膀上，尝试将其运用在自然语言处理领域的方方面面，来让人工智能的梦想更近一步。
+总得来说，google此次开源的bert和其预训练模型是非常有价值的，可探索和改进的内容也很多。相关数据集上已经出现了对bert进行修改后的复合模型，如squad2.0上哈工大(HIT)的```AoA + DA + BERT```以及西湖大学（DAMO）的```SLQA + BERT```。 
+在感谢google这份付出的同时，我们也可以借此站在巨人的肩膀上，尝试将其运用在自然语言处理领域的方方面面，让人工智能的梦想更近一步。
