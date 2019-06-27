@@ -5,3 +5,7 @@ refer：[KeyError: u'NearestNeighbors' on loading saved model from tf.contrib.fa
 #### 使用```tf.estimator```在做eval和predict的时候会默认载入out_dir里最新的ckpt
 
 解决办法:在```estimator.predict```里的参数```checkpoint_path```赋值
+
+
+####  train.init_from_checkpoint does not support mirrorredStrategy and CollectiveAllReduceStrategy
+1.确定optimizor
